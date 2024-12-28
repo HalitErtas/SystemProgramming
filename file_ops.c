@@ -136,7 +136,7 @@ void create_file() {
     printf("Enter the name of the file to be created: ");
     scanf("%s", file_name);
     
-    int fd = creat(file_name, S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IROTH); // Kullanıcı için okuma/yazma, grup ve diğerleri için okuma izinleri
+    int fd = creat(file_name, S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IROTH);
     if (fd == -1) {
         log_and_print_error("File creation failed", EIO);
         return;
