@@ -101,11 +101,12 @@ void write_file() {
     strcat(buff, "/");
     strcat(buff, fileName);
 
-    
-    r = stat(buff, &fs);
-    if(r == -1){
-        log_and_print_error("Do no have permission to read the file.", EACCES);
-        return;
+    if (choice == 'y') {
+        r = stat(buff, &fs);
+        if (r == -1) {
+            log_and_print_error("Do not have permission to read the file or file does not exist.", EACCES);
+            return;
+        }
     }
     
     fd = open(buff, flags, 0644);
