@@ -161,3 +161,56 @@ void delete_file() {
     sprintf(message, "File deleted successfully: %s\n", file_name);
     log_and_print_actions(message);
 }
+
+void copy_file_to_directory() {
+    int source_fd, dest_fd;
+    char buffer[4096];
+    ssize_t bytes_read, bytes_written;
+    char destination_path[2048];
+    char source_file[50], destination_dir[50];
+
+    printf("Enter the file name to copy: ");
+    scanf("%s", source_file);
+
+    printf("Enter the name of the folder to copy (full path): ");
+    scanf("%s", destination_dir);
+
+    snprintf(destination_path, sizeof(destination_path), "%s/%s", destination_dir, strrchr(source_file, '/') ? strrchr(source_file, '/') + 1 : source_file);
+
+    source_fd = open(source_file, O_RDONLY);
+    if (source_fd < 0) {
+        snprintf(message, sizeof(message), "Source file:%s could not be opened", source_file);
+        log_and_print_error(message, ENOENT);
+        return;
+    }
+
+    dest_fd = open(destination_path, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+    if (dest_fd < 0) {
+        if (snprintf(message, sizeof(message), "Target file:%s could not be opened", destination_path) >= sizeof(message)) {
+        fprintf(stderr, "Warning: Message truncated\n");
+        }
+        log_and_print_error(message, ENOENT);
+        close(source_fd);
+        return;
+    }
+
+    while ((bytes_read = read(source_fd, buffer, sizeof(buffer))) > 0) {
+        bytes_written = write(dest_fd, buffer, bytes_read);
+        if (bytes_written != bytes_read) {
+            log_and_print_error("File writing error", EIO);
+            break;
+        }
+    }
+
+    if (bytes_read < 0) {
+        log_and_print_error("File reading error", EIO);
+    }
+
+    close(source_fd);
+    close(dest_fd);
+
+    if (snprintf(message, sizeof(message), "File copied successfully: %s -> %s\n", source_file, destination_path) >= sizeof(message)) {
+    fprintf(stderr, "Warning: Message truncated\n");
+    }
+    log_and_print_actions(message);
+}
