@@ -130,3 +130,34 @@ void write_file() {
 
     close(fd);
 }
+
+void create_file() {
+    char file_name[20];
+    printf("Enter the name of the file to be created: ");
+    scanf("%s", file_name);
+    
+    int fd = creat(file_name, S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IROTH); // Kullanıcı için okuma/yazma, grup ve diğerleri için okuma izinleri
+    if (fd == -1) {
+        log_and_print_error("File creation failed", EIO);
+        return;
+    }
+
+    sprintf(message,"File created successfully: %s\n", file_name);
+    log_and_print_actions(message);
+
+    close(fd);
+}
+
+void delete_file() {
+    char file_name[20];
+    printf("Enter the name of the file to be deleted: ");
+    scanf("%s", file_name);
+    
+    if (unlink(file_name) == -1) {
+        log_and_print_error("File could not be deleted", EIO);
+        return;
+    }
+    
+    sprintf(message, "File deleted successfully: %s\n", file_name);
+    log_and_print_actions(message);
+}
