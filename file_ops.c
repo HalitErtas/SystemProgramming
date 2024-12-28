@@ -11,6 +11,65 @@
 #include <dirent.h>
 #include <ctype.h>
 #include <sys/stat.h>
+#include "common.h"
+
+void read_file() {
+    char fileName[50];
+    char buff[PATH_MAX];
+    int fd, sz;
+    struct stat fs;
+    int r;
+    char* c = (char*)malloc(1024 * sizeof(char));
+
+    if (!c) {
+        log_and_print_error("Memory allocation error", ENOMEM);
+        return;
+    }
+
+    printf("Enter the the file name to be read: ");
+    scanf("%s", fileName);
+
+    if (getcwd(buff, PATH_MAX) == NULL) {
+        log_and_print_error("getcwd error", EINVAL);
+        free(c);
+        return;
+    }
+
+    strcat(buff, "/");
+    strcat(buff, fileName);
+    
+    r = stat(buff, &fs);
+    if(r == -1){
+        sprintf(message, "Do not have permission to read %s file", fileName);
+        log_and_print_error(message, EACCES);
+        return;
+    }
+    
+    fd = open(buff, O_RDONLY);
+    if (fd < 0) {
+        log_and_print_error("Folder could not opened. Please enter valid folder name", ENOENT);
+        free(c);
+        return;
+    }
+
+    sz = read(fd, c, 1024);
+    if (sz < 0) {
+        log_and_print_error("File reading error", EIO);
+
+        perror("File reading error");
+    } else if (sz == 0) {
+        printf("Folder empty.\n");
+    } else {
+        c[sz] = '\0';
+        sprintf(message, "File read %s (%d bytes)", fileName, sz);
+        log_and_print_actions(message);
+        printf("\n----- File Content (%s) -----\n", fileName);
+        printf("%s\n", c);
+    }
+
+    close(fd);
+    free(c);
+}
 
 void write_file() {
     char fileName[50];
