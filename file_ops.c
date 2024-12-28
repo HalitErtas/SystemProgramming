@@ -2,6 +2,7 @@
 #include "file_ops.h"
 #include "color_utils.h"
 #include "logger.h"
+#include "common.h"
 #include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -11,7 +12,6 @@
 #include <dirent.h>
 #include <ctype.h>
 #include <sys/stat.h>
-#include "common.h"
 
 void read_file() {
     char fileName[50];
@@ -213,4 +213,78 @@ void copy_file_to_directory() {
     fprintf(stderr, "Warning: Message truncated\n");
     }
     log_and_print_actions(message);
+}
+
+void search_string_in_folder() {
+    char folder_path[2048];
+    char search_string[256];
+    char lower_search_string[256];
+    struct dirent *entry;
+    DIR *dirp;
+
+    printf("Enter the full path of the folder to search: ");
+    scanf("%s", folder_path);
+    printf("Enter the text you want to search for: ");
+    scanf("%s", search_string);
+
+    for (size_t i = 0; i < strlen(search_string); i++) {
+        lower_search_string[i] = tolower((unsigned char)search_string[i]);
+    }
+    lower_search_string[strlen(search_string)] = '\0';
+
+    dirp = opendir(folder_path);
+    if (dirp == NULL) {
+        log_and_print_error("Could not open folder", ENOENT);
+        return;
+    }
+
+    snprintf(message, sizeof(message), "--- Searching Results (%s) ---", search_string);
+    log_and_print_actions(message);
+
+    while ((entry = readdir(dirp)) != NULL) {
+        if (entry->d_type == DT_REG) {
+            char file_path[1024];
+            if (snprintf(file_path, sizeof(file_path), "%s/%s", folder_path, entry->d_name) >= sizeof(file_path)) {
+            fprintf(stderr, "Warning: File path truncated\n");
+            }
+
+            int file_fd = open(file_path, O_RDONLY);
+            if (file_fd < 0) {
+                log_and_print_error("Could not open file", EIO);
+                continue;
+            }
+
+            char buffer[4096];
+            ssize_t bytes_read;
+            int found = 0;
+
+            while ((bytes_read = read(file_fd, buffer, sizeof(buffer) - 1)) > 0) {
+                buffer[bytes_read] = '\0';  // Null terminator
+
+                char lower_buffer[512] = {0};
+                for (int i = 0; i < bytes_read; i++) {
+                    lower_buffer[i] = tolower((unsigned char)buffer[i]);
+                }
+                lower_buffer[bytes_read] = '\0';
+
+                if (strstr(lower_buffer, lower_search_string) != NULL) {
+                if (snprintf(message, sizeof(message), "Found: %s", file_path) >= sizeof(message)) {
+                fprintf(stderr, "Warning: Message truncated\n");
+                }
+                    log_and_print_actions(message);
+                    found = 1;
+                    break;
+                }
+            }
+
+            if (!found && bytes_read < 0) {
+                log_and_print_error("File reading error", EIO);
+            }
+
+            close(file_fd);
+        }
+    }
+
+    closedir(dirp);
+    log_and_print_actions("--- Searching Completed ---\n");
 }
