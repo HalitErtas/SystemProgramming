@@ -4,12 +4,12 @@
 #include "directory_ops.h"
 #include "permissions.h"
 #include "logger.h"
+#include "common.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 #include <sys/ioctl.h>
-#include "common.h"
 
 char log_file_path[512];
 char log_message[1024]; 
@@ -25,7 +25,7 @@ int main() {
     
     
     while (1) {
-        char fileName[50] = {0}; // case 11 (delete_folder)
+        char fileName[50] = {0}; // case 5 (delete_folder)
         
         yellow();
         print_centered("======== Menu ========");

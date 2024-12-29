@@ -2,7 +2,7 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
-extern char log_message[256];
+extern char log_message[1024];
 
 void get_log_file_path();
 void log_action(const char *message);
