@@ -1,6 +1,6 @@
 # Derleyici ve bayraklar
 CC = gcc
-CFLAGS = -Wall -Werror -I./include
+CFLAGS = -Wall -I./include
 
 # Klasörler
 SRC_DIR = .

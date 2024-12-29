@@ -1,10 +1,11 @@
 // This is logger.c file.
+#include <color_utils.h>
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
 #include <unistd.h>
 
-char log_message[256];
+extern char log_message[1024];
 extern char log_file_path[512];
 
 
@@ -12,7 +13,7 @@ void get_log_file_path(){
     char dir[512];
     getcwd(dir, sizeof(dir));
     
-    snprintf(log_file_path, sizeof(dir), "%s/../Log/log.txt", dir);
+    snprintf(log_file_path, sizeof(log_file_path), "%s/../Log/log.txt", dir);
 }
 
 
