@@ -1,44 +1,44 @@
-# Derleyici ve bayraklar
+# Compiler and flags
 CC = gcc
 CFLAGS = -Wall -I./include
 
-# Klasörler
+# Folders
 SRC_DIR = .
 OBJ_DIR = obj
 BIN_DIR = bin
 
-# Kaynak dosyaları
+# Source files
 SRCS = $(SRC_DIR)/main.c $(SRC_DIR)/directory_ops.c $(SRC_DIR)/file_ops.c $(SRC_DIR)/logger.c $(SRC_DIR)/permissions.c $(SRC_DIR)/color_utils.c
-# Hedef nesne dosyaları
+# Target object files
 OBJS = $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
-# Çıktı dosyası
+# Output file
 TARGET = $(BIN_DIR)/mainProgram
 
-# Varsayılan hedef: derleme ve çalıştırma
+# Default target: compile and run
 all: $(TARGET)
 
-# Nesne dosyalarını derleyin
+# Compile object files
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	@mkdir -p $(OBJ_DIR)  # obj dizini yoksa oluştur
+	@mkdir -p $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Programı bağla (linkle)
+# Link the program
 $(TARGET): $(OBJS)
-	@mkdir -p $(BIN_DIR)  # bin dizini yoksa oluştur
+	@mkdir -p $(BIN_DIR)
 	$(CC) $(OBJS) -o $(TARGET)
 
-# Programı çalıştır
+# Run the program
 run: $(TARGET)
 	$(TARGET)
 
-# Temizleme
+# Cleaning
 clean:
 	rm -rf $(OBJ_DIR) $(BIN_DIR)
 
-# Nesne dosyalarını ve çıktıyı temizle
+# Cleaning object files and output
 fclean: clean
 	rm -f $(TARGET)
 
-# Sadece derleme işlemi
+# Compilation process only
 re: fclean all
